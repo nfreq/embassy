@@ -49,10 +49,8 @@ where
 
 #[cfg(not(gpdma))]
 impl<'d, W: Word> SpiSlaveRingBufferedRx<'d, crate::mode::Async, W> {
-    /// Forward to the underlying async `SpiSlave::write()`.
     pub async fn write(&mut self, words: &[W]) -> Result<(), Error> {
-        // bring the trait into scope so `.write()` is found
-        use embedded_hal_async::spi::SpiBusWrite;
+        use embedded_hal_async::spi::SpiBus;
         self._inner.write(words).await
     }
 }
