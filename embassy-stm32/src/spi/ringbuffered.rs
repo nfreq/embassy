@@ -46,6 +46,13 @@ where
     }
 }
 
+impl<'d, T: PeriMode, W: Word> SpiSlaveRingBufferedRx<'d, T, W> {
+    /// Forward to the underlying `SpiSlave::write()`.
+    pub async fn write(&mut self, words: &[W]) -> Result<(), Error> {
+        self._inner.write(words).await
+    }
+}
+
 impl<'d, M: PeriMode> SpiSlave<'d, M> {
     /// Into SPI RingBuffered Rx
     pub fn into_ringbuffered_rx<W: Word>(mut self, rxdma_buffer: &'d mut [W]) -> SpiSlaveRingBufferedRx<'d, M, W> {
