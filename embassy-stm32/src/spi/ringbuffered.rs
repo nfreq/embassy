@@ -3,6 +3,7 @@ use super::{Error, RegsExt, Word};
 use crate::dma::ReadableRingBuffer;
 use crate::mode::Mode as PeriMode;
 
+
 /// SPI Slave Rx With Ring Buffer
 #[cfg(not(gpdma))]
 pub struct SpiSlaveRingBufferedRx<'d, T: PeriMode, W: Word> {
@@ -46,8 +47,14 @@ where
     }
 }
 
-pub async fn write(&mut self, words: &[W]) -> Result<(), Error> {
-    embedded_hal_async::spi::SpiBusWrite::write(&mut self._inner, words).await
+#[cfg(not(gpdma))]
+impl<'d, W: Word> SpiSlaveRingBufferedRx<'d, crate::mode::Async, W> {
+    /// Forward to the underlying async `SpiSlave::write()`.
+    pub async fn write(&mut self, words: &[W]) -> Result<(), Error> {
+        // bring the trait into scope so `.write()` is found
+        use embedded_hal_async::spi::SpiBusWrite;
+        self._inner.write(words).await
+    }
 }
 
 impl<'d, M: PeriMode> SpiSlave<'d, M> {
